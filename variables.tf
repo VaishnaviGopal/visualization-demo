@@ -7,5 +7,5 @@ variable "user2" {
 }
 
 variable "rg_name" {
-   default="default"
- }
+    default="default"
+}
