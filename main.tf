@@ -13,7 +13,7 @@ resource "ibm_resource_group" "demo_group1" {
 #KMS
 #*********************************************
 resource "ibm_resource_instance" "kp_instance" {
-  name     = "demo_KMS_instance-new"
+  name     = "demo_KMS_instance"
   service  = "kms"
   plan     = "tiered-pricing" 
   location = "us-south"
@@ -21,7 +21,7 @@ resource "ibm_resource_instance" "kp_instance" {
 
 resource "ibm_kp_key" "cos_encrypt" {
   key_protect_id  = ibm_resource_instance.kp_instance.guid
-  key_name     = "key-name-new"
+  key_name     = "key-name"
   standard_key = false
 }
 
@@ -30,7 +30,7 @@ resource "ibm_kp_key" "cos_encrypt" {
 #*****************************************
 
 resource "ibm_cis" "demo_web_domain" {
-  name              = "web_domain_new"
+  name              = "web_domain"
   resource_group_id = ibm_resource_group.demo_group1.id
   plan              = "enterprise-usage"
   location          = "global"
@@ -41,7 +41,7 @@ resource "ibm_cis_domain_settings" "demo_web_domain" {
   domain_id       = ibm_cis_domain.demo_web_domain.id
   waf             = "on" #set this off to trigger an alert
   ssl             = "full"
-  min_tls_version = "1.2"
+  min_tls_version = "1.1"
 }
 
 resource "ibm_cis_domain" "demo_web_domain" {
@@ -54,7 +54,7 @@ resource "ibm_cis_domain" "demo_web_domain" {
 #*****************************************
 
 resource "ibm_resource_instance" "cos_instance" {
-  name              = "demo_cos_instance_new"
+  name              = "demo_cos_instance"
   resource_group_id = ibm_resource_group.demo_group1.id
   service           = "cloud-object-storage"
   plan              = "standard"
@@ -62,15 +62,14 @@ resource "ibm_resource_instance" "cos_instance" {
 }
 
 resource "ibm_cos_bucket" "demo_bucket01" {
-  bucket_name          = "schbucket01"
+  bucket_name          = "sch001_demo_bucket01"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
-  key_protect          = ibm_kp_key.cos_encrypt.id
 }
 
 resource "ibm_cos_bucket" "demo_bucket02" {
-  bucket_name          = "schbucket02"
+  bucket_name          = "sch002_demo_bucket02"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
@@ -104,7 +103,7 @@ resource "ibm_iam_user_policy" "policy1" {
 
 resource "ibm_iam_user_policy" "policy2" {
   ibm_id = var.user2
-  roles  = ["Viewer"]
+  roles  = ["Viewer", "Writer"]
 
   resources  {
     service = "kms"
@@ -133,13 +132,13 @@ resource "ibm_iam_service_policy" "policy" {
 #**********************************************
 
 resource "ibm_is_vpc" "vpc1" {
-  name = "myvpc10demo"
+  name = "myvpc"
 }
 
 resource "ibm_is_subnet" "subnet1" {
   name                     = "mysubnet1"
   vpc                      = ibm_is_vpc.vpc1.id
-  zone                     = "us-south-1"
+  zone                     = "us_south-1"
   total_ipv4_address_count = 256
 }
 
@@ -153,25 +152,20 @@ resource "ibm_is_subnet" "subnet2" {
 resource "ibm_container_vpc_cluster" "cluster" {
   name              = "mycluster"
   vpc_id            = ibm_is_vpc.vpc1.id
-  flavor            = "bx2.2x8"
+  flavor            = "bc1-2x8"
   worker_count      = 3
   resource_group_id = ibm_resource_group.demo_group1.id
-  wait_till = "MasterNodeReady"
+
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
     name      = "us-south-1"
   }
-  
-  tags = [
-    "cart_application",
-    "v0.1.0",
-  ]
 }
 
-#resource "ibm_container_bind_service" "bind_service" {
- # cluster_name_id     = ibm_container_vpc_cluster.cluster.id
-#  service_instance_id = element(split(":", ibm_resource_instance.cos_instance.id), 7)
-#  namespace_id        = "default"
-#  role                = "Writer"
-#}
+resource "ibm_container_bind_service" "bind_service" {
+  cluster_name_id     = ibm_container_vpc_cluster.cluster.id
+  service_instance_id = element(split(":", ibm_resource_instance.cos_instance.id), 7)
+  namespace_id        = "default"
+  role                = "Writer"
+}
 
