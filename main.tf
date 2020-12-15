@@ -13,7 +13,7 @@ resource "ibm_resource_group" "demo_group1" {
 #KMS
 #*********************************************
 resource "ibm_resource_instance" "kp_instance" {
-  name     = "demo_KMS_instance"
+  name     = "visual_KMS_instance"
   service  = "kms"
   plan     = "tiered-pricing" 
   location = "us-south"
@@ -62,7 +62,7 @@ resource "ibm_resource_instance" "cos_instance" {
 }
 
 resource "ibm_cos_bucket" "demo_bucket01" {
-  bucket_name          = "schbucket01"
+  bucket_name          = "bucket0115dec"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
@@ -70,7 +70,7 @@ resource "ibm_cos_bucket" "demo_bucket01" {
 }
 
 resource "ibm_cos_bucket" "demo_bucket02" {
-  bucket_name          = "schbucket02"
+  bucket_name          = "bucket0215dec"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
@@ -115,7 +115,7 @@ resource "ibm_iam_user_policy" "policy2" {
 #service id
 #*****************************************
 resource "ibm_iam_service_id" "serviceID" {
-  name = "demo-cis-dervice"
+  name = "visual-cis-dervice"
 }
 
 resource "ibm_iam_service_policy" "policy" {
@@ -133,30 +133,30 @@ resource "ibm_iam_service_policy" "policy" {
 #**********************************************
 
 resource "ibm_is_vpc" "vpc1" {
-  name = "myvpc10demo"
+  name = "vpc10demo"
 }
 
 resource "ibm_is_subnet" "subnet1" {
-  name                     = "mysubnet1"
+  name                     = "demosubnet1"
   vpc                      = ibm_is_vpc.vpc1.id
   zone                     = "us-south-1"
   total_ipv4_address_count = 256
 }
 
 resource "ibm_is_subnet" "subnet2" {
-  name                     = "mysubnet2"
+  name                     = "demosubnet2"
   vpc                      = ibm_is_vpc.vpc1.id
   zone                     = "us-south-2"
   total_ipv4_address_count = 256
 }
 
 resource "ibm_container_vpc_cluster" "cluster" {
-  name              = "mycluster"
+  name              = "democluster"
   vpc_id            = ibm_is_vpc.vpc1.id
   flavor            = "bx2.2x8"
   worker_count      = 3
   resource_group_id = ibm_resource_group.demo_group1.id
-  wait_till = "MasterNodeReady"
+  wait_till = "OneWorkerNodeReady"
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
     name      = "us-south-1"
