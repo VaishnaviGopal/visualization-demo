@@ -154,7 +154,7 @@ resource "ibm_container_vpc_cluster" "cluster" {
   name              = "democluster"
   vpc_id            = ibm_is_vpc.vpc1.id
   flavor            = "bx2.2x8"
-  worker_count      = 3
+  worker_count      = 1
   resource_group_id = ibm_resource_group.demo_group1.id
   wait_till = "OneWorkerNodeReady"
   zones {
