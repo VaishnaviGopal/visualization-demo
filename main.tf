@@ -153,7 +153,7 @@ resource "ibm_is_subnet" "subnet2" {
 resource "ibm_container_vpc_cluster" "cluster" {
   name              = "democluster"
   vpc_id            = ibm_is_vpc.vpc1.id
-  flavor            = "bx2.2x8"
+  flavor            = "bx2.16x64"
   worker_count      = 1
   resource_group_id = ibm_resource_group.demo_group1.id
   wait_till = "OneWorkerNodeReady"
