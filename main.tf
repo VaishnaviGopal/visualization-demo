@@ -66,7 +66,7 @@ resource "ibm_cos_bucket" "demo_bucket01" {
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
-  //key_protect          = ibm_kp_key.cos_encrypt.id
+  #key_protect          = ibm_kp_key.cos_encrypt.id
 }
 
 resource "ibm_cos_bucket" "demo_bucket02" {
@@ -104,7 +104,7 @@ resource "ibm_iam_user_policy" "policy1" {
 
 resource "ibm_iam_user_policy" "policy2" {
   ibm_id = var.user2
-  roles  = ["Viewer"", "Writer"]
+  roles  = ["Viewer", "Writer"]
 
   resources  {
     service = "kms"
