@@ -41,7 +41,7 @@ resource "ibm_cis_domain_settings" "demo_web_domain" {
   domain_id       = ibm_cis_domain.demo_web_domain.id
   waf             = "on" #set this off to trigger an alert
   ssl             = "full"
-  min_tls_version = "1.1"
+  min_tls_version = "1.2"
 }
 
 resource "ibm_cis_domain" "demo_web_domain" {
@@ -62,15 +62,15 @@ resource "ibm_resource_instance" "cos_instance" {
 }
 
 resource "ibm_cos_bucket" "demo_bucket01" {
-  bucket_name          = "bucket_0115_dec"
+  bucket_name          = "democosbucket1"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
-  #key_protect          = ibm_kp_key.cos_encrypt.id
+  key_protect          = ibm_kp_key.cos_encrypt.id
 }
 
 resource "ibm_cos_bucket" "demo_bucket02" {
-  bucket_name          = "bucket_0215_dec"
+  bucket_name          = "democosbucket2"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   region_location      = "us-south"
   storage_class        = "standard"
@@ -104,7 +104,7 @@ resource "ibm_iam_user_policy" "policy1" {
 
 resource "ibm_iam_user_policy" "policy2" {
   ibm_id = var.user2
-  roles  = ["Viewer", "Writer"]
+  roles  = ["Viewer"]
 
   resources  {
     service = "kms"
@@ -161,6 +161,7 @@ resource "ibm_container_vpc_cluster" "cluster" {
     subnet_id = ibm_is_subnet.subnet1.id
     name      = "us-south-1"
   }
+  tags = ["democluster"]
 }
 
 #resource "ibm_container_bind_service" "bind_service" {
